@@ -58,11 +58,6 @@ def run_crawl(ctx: RunnerContext) -> dict:
     # ── gau ────────────────────────────────────────────────────────────────────
     if "gau" in available:
         out = d / "gau.txt"
-        run(
-            f"gau --threads {min(ctx.threads, 10)} --subs {ctx.domain}",
-            capture=False,
-            timeout=600,
-        )
         # gau writes to stdout by default; capture it
         rc, stdout, _ = run(
             f"gau --threads {min(ctx.threads, 10)} --subs {ctx.domain}",
