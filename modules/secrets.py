@@ -43,14 +43,12 @@ def run_secrets(ctx: RunnerContext) -> dict:
         info("trufflehog: scanning domain via git history + filesystem...")
         out_json = d / "trufflehog.json"
 
-        # Scan GitHub org if reachable
         rc, stdout, _ = run(
             [
                 "trufflehog",
                 "github",
                 "--org", ctx.domain.split(".")[0],
                 "--json",
-                "--only-verified",
             ],
             capture=True,
             timeout=600,
@@ -61,13 +59,12 @@ def run_secrets(ctx: RunnerContext) -> dict:
             found("trufflehog (github)", len(lines), out_json)
             all_findings.extend(lines)
 
-        # Also scan the HTTP endpoint directly
         live_file = ctx.out_dir / "http_probe" / "live_hosts.txt"
         if live_file.exists():
             for url in read_lines(live_file)[:10]:
                 out_url = d / f"trufflehog_{url.replace('://', '_').replace('/', '_')[:60]}.json"
                 rc, stdout, _ = run(
-                    ["trufflehog", "http", "--url", url, "--json", "--only-verified"],
+                    ["trufflehog", "http", "--url", url, "--json"],  # removed --only-verified
                     capture=True,
                     timeout=120,
                 )
@@ -82,22 +79,22 @@ def run_secrets(ctx: RunnerContext) -> dict:
     # ── gitleaks ───────────────────────────────────────────────────────────────
     if "gitleaks" in available:
         info("gitleaks: scanning for secrets in crawled content...")
-        js_urls, all_urls = _get_js_files_and_urls(ctx)
-
-        # If we have a local repo path to scan (uncommon in recon but possible)
-        # For web recon, point gitleaks at the output directory itself
         out_json = d / "gitleaks.json"
+
+        # gitleaks v8 has no --ignore-path flag; use a .gitleaksignore file instead
+        ignore_file = ctx.out_dir / ".gitleaksignore"
+        ignore_file.write_text("crawl/\nparams/\n")
+
         rc, stdout, stderr = run(
             [
                 "gitleaks",
                 "detect",
-                "--source", str(ctx.out_dir),
-                "--ignore-path", "crawl",
-                "--ignore-path", "params",
-                "--report-format", "json",
-                "--report-path", str(out_json),
+                "--source",          str(ctx.out_dir),
+                "-i",                str(ignore_file),   # --gitleaks-ignore-path
+                "--report-format",   "json",
+                "--report-path",     str(out_json),
                 "--no-git",
-                "--exit-code", "0",
+                "--exit-code",       "0",
             ],
             timeout=300,
         )

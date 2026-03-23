@@ -11,7 +11,6 @@ from core.console import warning, skipped, found, info
 
 def _get_hosts(ctx: RunnerContext) -> list[str]:
     """Get unique IP/hostname list to scan."""
-    # Prefer resolved subdomains
     candidates = [
         ctx.out_dir / "http_probe" / "live_hosts.txt",
         ctx.out_dir / "dns" / "all_resolved.txt",
@@ -21,7 +20,9 @@ def _get_hosts(ctx: RunnerContext) -> list[str]:
         if c.exists():
             hosts = read_lines(c)
             if hosts:
-                return hosts
+                # strip http:// or https:// and any trailing path
+                cleaned = [h.split("://")[-1].split("/")[0] for h in hosts]
+                return [h for h in cleaned if h]
     return [ctx.domain]
 
 
