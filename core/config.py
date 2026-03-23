@@ -113,8 +113,8 @@ MODULE_TOOL_REQUIREMENTS = {
         "note": "At least one of subfinder / amass / assetfinder must be present",
     },
     "dns": {
-        "required": ["dnsx", "dig"],
-        "optional": ["massdns"],
+        "required": ["dnsx"],
+        "optional": ["massdns", "dig"],
     },
     "http_probe": {
         "required": ["httpx"],
