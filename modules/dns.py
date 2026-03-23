@@ -62,7 +62,7 @@ def run_dns(ctx: RunnerContext) -> dict:
     resolved_file = d / "resolved.txt"
     if check_tool("dnsx"):
         run(
-            f"dnsx -l {input_file} -silent -o {resolved_file} -t {ctx.effective_threads(100)} -resp-only",
+            f"dnsx -l {input_file} -silent -o {resolved_file} -t {ctx.effective_threads(100)}",
             timeout=600,
         )
         resolved = read_lines(resolved_file)
@@ -77,7 +77,7 @@ def run_dns(ctx: RunnerContext) -> dict:
     if wl and check_tool("dnsx"):
         info(f"DNS brute-force with wordlist: {wl.name}")
         run(
-            f"dnsx -d {ctx.domain} -w {wl} -silent -o {brute_file} -t {ctx.effective_threads(100)} -resp-only",
+            f"dnsx -d {ctx.domain} -w {wl} -silent -o {brute_file} -t {ctx.effective_threads(100)}",
             timeout=900,
         )
         brute = read_lines(brute_file)
@@ -105,7 +105,7 @@ def run_dns(ctx: RunnerContext) -> dict:
         skipped("massdns")
 
     # ── merge all resolved ─────────────────────────────────────────────────────
-    sources = [f for f in [resolved_file, brute_file] if f.exists()]
+    sources = [f for f in [resolved_file, brute_file, massdns_file] if f.exists()]
     all_resolved_file = d / "all_resolved.txt"
     all_resolved = merge_files(sources, all_resolved_file)
     found("TOTAL resolved (deduplicated)", len(all_resolved), all_resolved_file)
