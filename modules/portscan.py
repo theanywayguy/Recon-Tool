@@ -13,6 +13,7 @@ def _get_hosts(ctx: RunnerContext) -> list[str]:
     """Get unique IP/hostname list to scan."""
     # Prefer resolved subdomains
     candidates = [
+        ctx.out_dir / "http_probe" / "live_hosts.txt",
         ctx.out_dir / "dns" / "all_resolved.txt",
         ctx.out_dir / "subdomains" / "all_subdomains.txt",
     ]

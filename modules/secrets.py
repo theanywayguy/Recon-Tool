@@ -92,6 +92,8 @@ def run_secrets(ctx: RunnerContext) -> dict:
                 "gitleaks",
                 "detect",
                 "--source", str(ctx.out_dir),
+                "--ignore-path", "crawl",
+                "--ignore-path", "params",
                 "--report-format", "json",
                 "--report-path", str(out_json),
                 "--no-git",

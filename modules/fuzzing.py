@@ -58,6 +58,7 @@ def run_fuzzing(ctx: RunnerContext) -> dict:
                     "-u", f"{url.rstrip('/')}/FUZZ",
                     "-w", str(wl),
                     "-t", str(min(ctx.threads, 40)),
+                    "-ic",
                     "-mc", "200,201,204,301,302,307,401,403,405",
                     "-o", str(out_json),
                     "-of", "json",
