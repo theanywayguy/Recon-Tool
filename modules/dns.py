@@ -31,7 +31,7 @@ def _zone_transfer(ctx: RunnerContext, d: Path):
             f"dig AXFR {ctx.domain} @{ns}",
             capture=True, timeout=30,
         )
-        if "XFR size" in stdout or "Transfer failed" not in stdout:
+        if "XFR size" in stdout:
             results.append(f"=== {ns} ===\n{stdout}")
 
     if results:
